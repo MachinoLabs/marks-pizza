@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mark's Pizza | Scratch. Save. Smile.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-light: #f9e29c;
+            --deep-red: #800000;
+            --black: #0a0a0a;
+            --machino-cyan: #00e5ff; /* Your Logo's Cyan */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle, #600000 0%, #200000 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .coupon-card {
+            background: var(--black);
+            max-width: 400px;
+            width: 100%;
+            border-radius: 30px;
+            text-align: center;
+            border: 2px solid var(--gold);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.2);
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .logo-svg { width: 100%; max-width: 300px; height: auto; margin-bottom: 5px; }
+
+        .tagline {
+            color: var(--gold-light);
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .scratch-container {
+            position: relative;
+            width: 280px; height: 140px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid var(--gold);
+        }
+
+        .prize-revealed {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: white; z-index: 1; padding: 10px;
+        }
+
+        #prize-amount { color: var(--deep-red); font-size: 2.2rem; font-weight: 900; line-height: 1.1; }
+        #prize-desc { color: #333; font-weight: 700; font-size: 0.8rem; margin-top: 5px; }
+        .limit-text { font-size: 0.6rem; color: #888; margin-top: 4px; font-weight: bold; text-transform: uppercase; }
+
+        #scratch-canvas { position: absolute; top: 0; left: 0; z-index: 2; touch-action: none; cursor: crosshair; }
+
+        #action-area { display: none; margin-top: 30px; animation: bounceIn 0.6s ease-out; }
+
+        .btn-claim {
+            display: block;
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold));
+            color: #300000;
+            text-decoration: none;
+            padding: 18px;
+            border-radius: 50px;
+            font-weight: 900;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .instruction { color: white; font-size: 0.75rem; margin-top: 15px; letter-spacing: 2px; opacity: 0.8; }
+        .footer { color: var(--gold); font-size: 0.65rem; margin-top: 25px; letter-spacing: 1px; line-height: 1.4; }
+
+        /* CLEAN MACHINOLABS SIGNATURE */
+        .machino-signature {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .machino-link {
+            text-decoration: none;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .machino-link span {
+            color: var(--machino-cyan);
+            font-weight: 900;
+            text-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+        }
+
+        .machino-link:hover {
+            color: white;
+            opacity: 1;
+        }
+
+        .contact-info {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.6rem;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="coupon-card">
+        <svg viewBox="0 0 400 100" class="logo-svg">
+            <defs>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#d4af37;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#f9e29c;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#d4af37;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <text x="50%" y="70%" text-anchor="middle" fill="url(#goldGrad)" style="font-family:'Great Vibes', cursive; font-size: 75px;">Mark's Pizza</text>
+        </svg>
+
+        <p class="tagline">Scratch. Save. Smile.</p>
+
+        <div class="scratch-container">
+            <div class="prize-revealed">
+                <h2 id="prize-amount">PRIZE</h2>
+                <p id="prize-desc">DESCRIPTION</p>
+                <p class="limit-text">* Limit one coupon per order</p>
+            </div>
+            <canvas id="scratch-canvas" width="280" height="140"></canvas>
+        </div>
+
+        <p class="instruction" id="hint">SCRATCH THE GOLD TO REVEAL</p>
+
+        <div id="action-area">
+            <a href="tel:7172742200" class="btn-claim">TAP TO CALL: (717) 274-2200</a>
+            <p id="claim-instruction" style="color:white; font-size: 0.8rem; margin-top:10px;"></p>
+        </div>
+
+        <div class="footer">
+            748 LOCUST ST, LEBANON • SINCE 1999<br>
+            LIMIT ONE COUPON PER ORDER • NOT VALID WITH OTHER OFFERS
+        </div>
+    </div>
+
+    <!-- MachinoLabs Professional Footer -->
+    <div class="machino-signature">
+        <a href="https://github.com/MachinoLabs" target="_blank" class="machino-link">
+            Built by <span>MachinoLabs</span>
+        </a>
+        <div class="contact-info">
+            JOE • 717.623.2907
+        </div>
+    </div>
+
+    <canvas id="confetti" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;"></canvas>
+
+    <script>
+        const prizes = [
+            { amount: "$2.00 OFF", desc: "ANY LARGE PIZZA", code: "MARKSLG2" },
+            { amount: "FREE", desc: "GARLIC TWISTS w/ $15+ ORDER", code: "TWISTFREE" },
+            { amount: "$3.00 OFF", desc: "ANY XL SPECIAL PIZZA", code: "XLMARK3" },
+            { amount: "FREE", desc: "2L SODA w/ XL PIZZA PURCHASE", code: "SODA2L" },
+            { amount: "FREE", desc: "CHOC CHIP COOKIE w/ ANY SUB", code: "COOKIE" },
+            { amount: "FREE", desc: "BROWNIE w/ ANY DINNER", code: "SWEET" },
+            { amount: "$1.00 OFF", desc: "ANY SLICE & SODA COMBO", code: "SLICE1" },
+            { amount: "10% OFF", desc: "YOUR ENTIRE ORDER", code: "MARK10" },
+            { amount: "$5.00 OFF", desc: "ANY ORDER OVER $30", code: "BIGSAVE5" },
+            { amount: "FREE", desc: "SIDE OF FRIES w/ ANY WRAP", code: "FRIES" }
+        ];
+
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        let isDrawing = false;
+        let isRevealed = false;
+
+        function init() {
+            // Fix for "LOADING" issue: Pick prize immediately
+            const selectedPrize = prizes[Math.floor(Math.random() * prizes.length)];
+            document.getElementById('prize-amount').innerText = selectedPrize.amount;
+            document.getElementById('prize-desc').innerText = selectedPrize.desc;
+            document.getElementById('claim-instruction').innerText = "Mention code " + selectedPrize.code + " to claim!";
+
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#d4af37');
+            grad.addColorStop(0.3, '#f9e29c');
+            grad.addColorStop(0.7, '#d4af37');
+            grad.addColorStop(1, '#f9e29c');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for(let i=0; i<30; i++) {
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.beginPath();
+                ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*2, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = '#4a3500';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('SCRATCH HERE', canvas.width/2, canvas.height/2 + 6);
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        function scratch(e) {
+            if (!isDrawing || isRevealed) return;
+            const pos = getPos(e);
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 25, 0, Math.PI * 2);
+            ctx.fill();
+            checkPercent();
+        }
+
+        function checkPercent() {
+            const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            let clear = 0;
+            for (let i = 0; i < data.length; i += 4) { if (data[i + 3] < 128) clear++; }
+            if (clear / (data.length / 4) > 0.5) {
+                isRevealed = true;
+                canvas.style.transition = 'opacity 0.6s';
+                canvas.style.opacity = '0';
+                setTimeout(() => {
+                    canvas.style.display = 'none';
+                    document.getElementById('action-area').style.display = 'block';
+                    document.getElementById('hint').style.display = 'none';
+                    triggerConfetti();
+                }, 600);
+            }
+        }
+
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('touchstart', (e) => { isDrawing = true; e.preventDefault(); });
+        window.addEventListener('mouseup', () => isDrawing = false);
+        window.addEventListener('touchend', () => isDrawing = false);
+        canvas.addEventListener('mousemove', scratch);
+        canvas.addEventListener('touchmove', scratch);
+
+        function triggerConfetti() {
+            const c = document.getElementById('confetti');
+            const s = c.getContext('2d');
+            c.width = window.innerWidth; c.height = window.innerHeight;
+            let p = Array.from({length: 100}, () => ({
+                x: Math.random() * c.width, y: -20,
+                r: Math.random() * 6 + 2,
+                v: Math.random() * 5 + 2,
+                color: `hsl(${Math.random() * 360}, 100%, 50%)`
+            }));
+            function frame() {
+                s.clearRect(0,0,c.width,c.height);
+                p.forEach(i => { i.y += i.v; s.fillStyle = i.color; s.fillRect(i.x, i.y, i.r, i.r); });
+                requestAnimationFrame(frame);
+            }
+            frame();
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>
